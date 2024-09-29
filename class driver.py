@@ -1,6 +1,4 @@
 import json
-
-
 class Driver:
     def __init__(self, driver_id=None, last_name=None, first_name=None, patronymic=None, experience=None):
         if isinstance(driver_id, str):
@@ -94,6 +92,26 @@ class Driver:
     def set_experience(self, experience: int):
         self.validate_experience(experience)
         self.__experience = experience
+
+    # Полная версия объекта
+    def __repr__(self):
+        return (f"Driver(driver_id={self.__driver_id}, last_name='{self.__last_name}', "
+                f"first_name='{self.__first_name}', patronymic='{self.__patronymic}', "
+                f"experience={self.__experience})")
+
+    # Краткая версия объекта
+    def short_description(self):
+        return f"{self.__last_name} {self.__first_name} ({self.__driver_id})"
+
+    # Метод для сравнения объектов
+    def __eq__(self, other):
+        if not isinstance(other, Driver):
+            return NotImplemented
+        return (self.__driver_id == other.__driver_id and
+                self.__last_name == other.__last_name and
+                self.__first_name == other.__first_name and
+                self.__patronymic == other.__patronymic and
+                self.__experience == other.__experience)
 
     # Cтроковое представление информации о водителе
     def __str__(self):

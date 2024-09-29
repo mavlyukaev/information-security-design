@@ -1,27 +1,57 @@
-class Driver:
-    def __init__(self, driver_id: int, last_name: str, first_name: str, patronymic: str, experience: int):
-        # Валидация полей при создании объекта
-        self.set_driver_id(driver_id)
-        self.set_last_name(last_name)
-        self.set_first_name(first_name)
-        self.set_patronymic(patronymic)
-        self.set_experience(experience)
+import json
 
-    # Универсальный статический метод для проверки строковых полей
+
+class Driver:
+    def __init__(self, driver_id=None, last_name=None, first_name=None, patronymic=None, experience=None):
+        if isinstance(driver_id, str):
+            # Инициализация из строки
+            self.initialize_from_string(driver_id)
+        elif isinstance(driver_id, dict):
+            # Инициализация из JSON (словарь)
+            self.initialize_from_json(driver_id)
+        else:
+            # Инициализация из отдельных параметров
+            self.set_driver_id(driver_id)
+            self.set_last_name(last_name)
+            self.set_first_name(first_name)
+            self.set_patronymic(patronymic)
+            self.set_experience(experience)
+
+    # Инициализация из строки
+    def initialize_from_string(self, data_str: str):
+        data = data_str.split(',')
+        if len(data) != 5:
+            raise ValueError(
+                "String must contain exactly 5 values: driver_id,last_name,first_name,patronymic,experience")
+
+        driver_id, last_name, first_name, patronymic, experience = data
+        self.set_driver_id(int(driver_id))
+        self.set_last_name(last_name.strip())
+        self.set_first_name(first_name.strip())
+        self.set_patronymic(patronymic.strip())
+        self.set_experience(int(experience))
+
+    # Инициализация из JSON (словаря)
+    def initialize_from_json(self, json_data: dict):
+        self.set_driver_id(json_data.get('driver_id'))
+        self.set_last_name(json_data.get('last_name'))
+        self.set_first_name(json_data.get('first_name'))
+        self.set_patronymic(json_data.get('patronymic'))
+        self.set_experience(json_data.get('experience'))
+
+    # Статические методы для валидации
     @staticmethod
     def validate_string(value: str, field_name: str) -> bool:
         if not isinstance(value, str) or len(value.strip()) == 0:
             raise ValueError(f"{field_name} must be a non-empty string")
         return True
 
-    # Статический метод для проверки идентификатора водителя
     @staticmethod
     def validate_driver_id(driver_id: int) -> bool:
         if not isinstance(driver_id, int) or driver_id <= 0:
             raise ValueError("Driver ID must be a positive integer")
         return True
 
-    # Статический метод для проверки опыта водителя
     @staticmethod
     def validate_experience(experience: int) -> bool:
         if not isinstance(experience, int) or experience < 0:

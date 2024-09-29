@@ -1,21 +1,16 @@
-import json
 class Driver:
     def __init__(self, driver_id=None, last_name=None, first_name=None, patronymic=None, experience=None):
         if isinstance(driver_id, str):
-            # Инициализация из строки
             self.initialize_from_string(driver_id)
         elif isinstance(driver_id, dict):
-            # Инициализация из JSON (словарь)
             self.initialize_from_json(driver_id)
         else:
-            # Инициализация из отдельных параметров
             self.set_driver_id(driver_id)
             self.set_last_name(last_name)
             self.set_first_name(first_name)
             self.set_patronymic(patronymic)
             self.set_experience(experience)
 
-    # Инициализация из строки
     def initialize_from_string(self, data_str: str):
         data = data_str.split(',')
         if len(data) != 5:
@@ -29,7 +24,6 @@ class Driver:
         self.set_patronymic(patronymic.strip())
         self.set_experience(int(experience))
 
-    # Инициализация из JSON (словаря)
     def initialize_from_json(self, json_data: dict):
         self.set_driver_id(json_data.get('driver_id'))
         self.set_last_name(json_data.get('last_name'))
@@ -37,7 +31,6 @@ class Driver:
         self.set_patronymic(json_data.get('patronymic'))
         self.set_experience(json_data.get('experience'))
 
-    # Статические методы для валидации
     @staticmethod
     def validate_string(value: str, field_name: str) -> bool:
         if not isinstance(value, str) or len(value.strip()) == 0:
@@ -93,17 +86,15 @@ class Driver:
         self.validate_experience(experience)
         self.__experience = experience
 
-    # Полная версия объекта
     def __repr__(self):
         return (f"Driver(driver_id={self.__driver_id}, last_name='{self.__last_name}', "
                 f"first_name='{self.__first_name}', patronymic='{self.__patronymic}', "
                 f"experience={self.__experience})")
 
-    # Краткая версия объекта
-    def short_description(self):
-        return f"{self.__last_name} {self.__first_name} ({self.__driver_id})"
+    def __str__(self):
+        return (f"Driver ID: {self.__driver_id}, Name: {self.__last_name} {self.__first_name} {self.__patronymic}, "
+                f"Experience: {self.__experience} years")
 
-    # Метод для сравнения объектов
     def __eq__(self, other):
         if not isinstance(other, Driver):
             return NotImplemented
@@ -113,7 +104,33 @@ class Driver:
                 self.__patronymic == other.__patronymic and
                 self.__experience == other.__experience)
 
-    # Cтроковое представление информации о водителе
+
+class DriverSummary(Driver):
+    def __init__(self, driver: Driver, inn: str, ogrn: str):
+        super().__init__(driver.get_driver_id(), driver.get_last_name(),
+                         driver.get_first_name(), driver.get_patronymic(),
+                         driver.get_experience())
+        self.inn = inn
+        self.ogrn = ogrn
+
     def __str__(self):
-        return (f"Driver ID: {self.__driver_id}, Name: {self.__last_name} {self.__first_name} {self.__patronymic}, "
-                f"Experience: {self.__experience} years")
+        return (f"Driver Summary: {self.get_last_name()} {self.get_first_name()[0]}. {self.get_patronymic()[0]}., "
+                f"INN: {self.inn}, OGRN: {self.ogrn}")
+
+    def short_description(self):
+        return f"{self.get_last_name()} {self.get_first_name()[0]}. {self.get_patronymic()[0]}."
+
+
+# Пример использования
+driver = Driver(1, "Ivanov", "Ivan", "Ivanovich", 5)
+summary = DriverSummary(driver, inn="123456789012", ogrn="1234567891234")
+
+# Вывод полной информации
+print(repr(driver))
+
+# Вывод краткой информации
+print(summary)  # Полная информация о кратком представлении
+print(summary.short_description())  # Краткое описание
+
+# Сравнение объектов
+print(driver == summary)  # False, так как это разные классы

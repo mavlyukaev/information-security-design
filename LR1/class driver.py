@@ -133,4 +133,4 @@ print(summary)  # Полная информация о кратком предс
 print(summary.short_description())  # Краткое описание
 
 # Сравнение объектов
-print(driver == summary)  # False, так как это разные классы
+print(driver == summary)

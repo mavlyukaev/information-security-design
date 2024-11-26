@@ -1,22 +1,47 @@
+class MainView:
+    def __init__(self):
+        self.delete_callback = None
+
+    def show(self, data):
+        """Отобразить данные в таблице"""
+        print("Текущие данные:")
+        for record in data:
+            print(record)
+
+    def update_table(self, updated_data):
+        """Обновить таблицу с данными"""
+        print("\nТаблица обновлена:")
+        self.show(updated_data)
+
+    def set_delete_callback(self, callback):
+        """Установить обработчик для удаления записи"""
+        self.delete_callback = callback
+
+    def simulate_delete_action(self, record_id):
+        """Эмулировать удаление записи"""
+        if self.delete_callback:
+            self.delete_callback(record_id)
+
+
 class AddRecordView:
     def __init__(self):
         self.submit_callback = None
         self.cancel_callback = None
 
     def show(self):
-        """Отобразить окно для добавления записи"""
-        print("Окно добавления записи открыто.")
+        """Отобразить окно добавления записи"""
+        print("Открыто окно добавления записи")
 
     def set_submit_callback(self, callback):
-        """Установить обработчик для кнопки 'Добавить'"""
+        """Установить обработчик кнопки 'Добавить'"""
         self.submit_callback = callback
 
     def set_cancel_callback(self, callback):
-        """Установить обработчик для кнопки 'Отмена'"""
+        """Установить обработчик кнопки 'Отмена'"""
         self.cancel_callback = callback
 
     def get_input_data(self):
-        """Получить данные от пользователя (эмулируем)"""
+        """Получить вводимые пользователем данные"""
         return {
             "LastName": input("Введите фамилию: "),
             "FirstName": input("Введите имя: "),
@@ -27,6 +52,7 @@ class AddRecordView:
     def close(self):
         """Закрыть окно"""
         print("Окно добавления записи закрыто.")
+
 
 class AddRecordController:
     def __init__(self, repository, add_record_view, main_controller):

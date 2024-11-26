@@ -23,6 +23,13 @@ class MainController:
         full_data = self.repository.get_by_id(item_id)
         self.main_view.open_details(full_data)
 
+    def delete_record(self, record_id):
+        """Удалить запись по ID"""
+        self.repository.delete_entity_by_id(record_id)
+        # Обновить главную таблицу после удаления
+        updated_data = self.repository.load_entities()
+        self.main_view.update_table(updated_data)
+
 class RepositoryWithObserver:
     def __init__(self):
         self.data = []
@@ -42,3 +49,8 @@ class RepositoryWithObserver:
         self.data = self.fetch_data_from_db()
         self.notify_observers()
         return self.data
+
+    def delete_entity_by_id(self, record_id):
+        """Удалить объект из репозитория"""
+        self.data = [record for record in self.data if record["id"] != record_id]
+        self.notify_observers()

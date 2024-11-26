@@ -30,6 +30,13 @@ class MainController:
         updated_data = self.repository.load_entities()
         self.main_view.update_table(updated_data)
 
+    def sort_records(self, field):
+        """Сортировать записи по указанному полю"""
+        try:
+            self.repository.sort_by_field(field)
+        except ValueError as e:
+            print(f"Ошибка сортировки: {e}")
+
 class RepositoryWithObserver:
     def __init__(self):
         self.data = []
@@ -53,4 +60,11 @@ class RepositoryWithObserver:
     def delete_entity_by_id(self, record_id):
         """Удалить объект из репозитория"""
         self.data = [record for record in self.data if record["id"] != record_id]
+        self.notify_observers()
+
+    def sort_by_field(self, field):
+        """Сортировать записи по указанному полю"""
+        if not self.data or field not in self.data[0]:
+            raise ValueError(f"Поле {field} отсутствует в данных.")
+        self.data.sort(key=lambda record: record[field])
         self.notify_observers()

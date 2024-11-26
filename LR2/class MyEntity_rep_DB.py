@@ -35,7 +35,7 @@ class MyEntity_rep_DB:
 
     def get_k_n_short_list(self, k, n):
         """Получить список k по счету n объектов класса short"""
-        offset = (n - 1) * k
+        offset = (k - 1) * n
         query = "SELECT LastName, FirstName, Patronymic FROM drivers LIMIT %s OFFSET %s"
         self.cursor.execute(query, (k, offset))
         results = self.cursor.fetchall()

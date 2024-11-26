@@ -30,8 +30,8 @@ class MyEntity_rep_yaml:
 
     def get_k_n_short_list(self, k, n):
         """Получить список k по счету n объектов класса short."""
-        start_index = (n - 1) * k
-        end_index = start_index + k
+        start_index = (k - 1) * n
+        end_index = start_index + n
         return [DriverSummary(entity, entity.INN, entity.OGRN) for entity in self.entities[start_index:end_index]]
 
     def sort_by_field(self, field):

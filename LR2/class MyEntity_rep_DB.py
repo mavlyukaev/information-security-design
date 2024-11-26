@@ -1,4 +1,4 @@
-#import mysql.connector
+import sqlite3
 
 class MyEntity_rep_DB:
     def __init__(self, host, user, password, database):
@@ -9,6 +9,20 @@ class MyEntity_rep_DB:
             database=database
         )
         self.cursor = self.connection.cursor(dictionary=True)
+
+     def initialize_db(self):
+        """Инициализация базы данных SQLite и создание таблицы drivers."""
+        self.cursor.execute("""
+            CREATE TABLE IF NOT EXISTS drivers (
+                DriverId INTEGER PRIMARY KEY AUTOINCREMENT,
+                LastName TEXT NOT NULL,
+                FirstName TEXT NOT NULL,
+                Patronymic TEXT,
+                Experience INTEGER NOT NULL
+            )
+        """)
+        self.connection.commit()
+        print("База данных SQLite и таблица 'drivers' успешно созданы.")
 
     def get_by_id(self, driver_id):
         """Получить объект по ID"""

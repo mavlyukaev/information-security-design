@@ -59,7 +59,7 @@ class MyEntity_rep_DB:
 
     def get_k_n_short_list(self, k, n):
         """Получить список k по счету n объектов"""
-        offset = (n - 1) * k
+        offset = (k - 1) * n
         query = "SELECT LastName, FirstName, Patronymic FROM drivers LIMIT ? OFFSET ?"
         cursor = self.db_manager.execute_query(query, (k, offset))
         results = cursor.fetchall()

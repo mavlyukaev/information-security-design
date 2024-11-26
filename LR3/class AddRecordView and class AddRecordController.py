@@ -21,6 +21,16 @@ class MainView:
         """Эмулировать удаление записи"""
         if self.delete_callback:
             self.delete_callback(record_id)
+            
+    def simulate_sort_action(self, field):
+        """Эмулировать действие сортировки"""
+        print(f"Сортировка по полю: {field}")
+        if self.sort_callback:
+            self.sort_callback(field)
+
+    def set_sort_callback(self, callback):
+        """Установить обработчик для сортировки"""
+        self.sort_callback = callback
 
 
 class AddRecordView:
@@ -107,13 +117,19 @@ from controller import MainController, AddRecordController
 from repository import RepositoryWithObserver
 
 if __name__ == "__main__":
-    # Создание репозитория и главного окна
+    # Создание компонентов
     repository = RepositoryWithObserver()
     main_view = MainView()
     main_controller = MainController(repository, main_view)
 
-    # Открытие главного окна
+    # Устанавливаем обработчик сортировки
+    main_view.set_sort_callback(main_controller.sort_records)
+
+    # Запуск приложения
     main_controller.start()
+
+    # Эмуляция сортировки
+    main_view.simulate_sort_action("LastName")
 
     # Добавление записи через новое окно
     add_record_view = AddRecordView()

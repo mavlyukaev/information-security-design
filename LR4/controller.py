@@ -1,13 +1,14 @@
 from model import Model
-from view import View
+from iview import IView
 from urllib.parse import parse_qs
 
 class Controller:
-    def __init__(self):
-        self.model = Model()
-        self.view = View()
+    def __init__(self, model: Model, view: IView):
+        self.model = model
+        self.view = view
 
     def index(self):
+        """Главная страница с таблицей записей"""
         records = self.model.get_all_records()
         rows = "\n".join(
             f"<tr><td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td>"
@@ -17,6 +18,7 @@ class Controller:
         return self.view.render_template("index.html", records=rows)
 
     def details(self, record_id):
+        """Просмотр деталей записи"""
         record = self.model.get_record_by_id(record_id)
         if record:
             record_dict = {
@@ -27,13 +29,14 @@ class Controller:
                 "experience": record[4],
             }
             return self.view.render_template("details.html", **record_dict)
-        return "Запись не найдена"
-
+        return self.view.render_template("error.html", message="Запись не найдена")
 
     def add_form(self):
+        """Отобразить форму добавления записи"""
         return self.view.render_template("add.html")
 
     def add_record(self, post_data):
+        """Добавить новую запись"""
         data = parse_qs(post_data)
         last_name = data["last_name"][0]
         first_name = data["first_name"][0]
@@ -48,8 +51,8 @@ class Controller:
         self.model.add_record(last_name, first_name, patronymic, experience)
         return self.view.render_template("success.html", message="Запись успешно добавлена!")
 
-
     def edit_form(self, record_id):
+        """Отобразить форму редактирования записи"""
         record = self.model.get_record_by_id(record_id)
         if record:
             record_dict = {
@@ -60,11 +63,10 @@ class Controller:
                 "experience": record[4],
             }
             return self.view.render_template("edit.html", **record_dict)
-        return "Запись не найдена"
-
-
+        return self.view.render_template("error.html", message="Запись не найдена")
 
     def update_record(self, record_id, post_data):
+        """Обновить существующую запись"""
         data = parse_qs(post_data)
         last_name = data["last_name"][0]
         first_name = data["first_name"][0]
@@ -79,8 +81,7 @@ class Controller:
         self.model.update_record(record_id, last_name, first_name, patronymic, experience)
         return self.view.render_template("success.html", message="Запись успешно обновлена!")
 
-
-
-
     def delete_record(self, record_id):
+        """Удалить запись"""
         self.model.delete_record(record_id)
+        return self.view.render_template("success.html", message="Запись успешно удалена!")

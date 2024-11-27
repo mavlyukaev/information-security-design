@@ -1,39 +1,51 @@
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from controller import Controller
+from model import Model
+from view import View
 from urllib.parse import parse_qs, unquote
 
 
 class RequestHandler(BaseHTTPRequestHandler):
-    controller = Controller()
+    def __init__(self, *args, **kwargs):
+        model = Model()
+        view = View()
+        self.controller = Controller(model, view)
+        super().__init__(*args, **kwargs)
 
     def do_GET(self):
         try:
             if self.path == "/":
                 self._send_response(200, self.controller.index())
             elif self.path.startswith("/details/"):
-                record_id = int(unquote(self.path.split("/")[-1]))
-                self._send_response(200, self.controller.details(record_id))
+                record_id = self._extract_record_id()
+                if record_id is not None:
+                    self._send_response(200, self.controller.details(record_id))
+                else:
+                    self._send_response(400, "<h1>Ошибка</h1><p>Некорректный ID записи.</p>")
             elif self.path == "/add":
                 self._send_response(200, self.controller.add_form())
             elif self.path.startswith("/edit/"):
-                record_id = int(unquote(self.path.split("/")[-1]))
-                self._send_response(200, self.controller.edit_form(record_id))
+                record_id = self._extract_record_id()
+                if record_id is not None:
+                    self._send_response(200, self.controller.edit_form(record_id))
+                else:
+                    self._send_response(400, "<h1>Ошибка</h1><p>Некорректный ID записи.</p>")
             elif self.path.startswith("/delete/"):
-                record_id = int(unquote(self.path.split("/")[-1]))
-                self.controller.delete_record(record_id)
-                self._redirect("/")
+                record_id = self._extract_record_id()
+                if record_id is not None:
+                    self.controller.delete_record(record_id)
+                    self._redirect("/")
+                else:
+                    self._send_response(400, "<h1>Ошибка</h1><p>Некорректный ID записи.</p>")
             else:
                 self._send_response(404, "<h1>404</h1><p>Страница не найдена.</p>")
         except Exception as e:
             self._send_response(500, f"<h1>Ошибка сервера</h1><p>{e}</p>")
 
     def do_POST(self):
-        """Обработка POST-запросов"""
         try:
             content_length = int(self.headers["Content-Length"])
             post_data = self.rfile.read(content_length).decode()
-
-            print(f"Обработка POST-запроса: {self.path}, данные: {post_data}")  # Отладка
 
             if self.path == "/add":
                 response = self.controller.add_record(post_data)
@@ -42,25 +54,21 @@ class RequestHandler(BaseHTTPRequestHandler):
                 else:
                     self._redirect("/")
             elif self.path.startswith("/edit/"):
-                # Убедимся, что record_id корректно декодирован
-                record_id = self.path.split("/")[-1]
-                record_id = record_id.strip("{}")  # Убираем фигурные скобки, если есть
-                record_id = int(record_id)
-
-                print(f"Редактирование записи с ID: {record_id}")  # Отладка
-
-                response = self.controller.update_record(record_id, post_data)
-                if "Ошибка" in response:
-                    self._send_response(400, f"<h1>Ошибка редактирования</h1><p>{response}</p>")
+                record_id = self._extract_record_id()
+                if record_id is not None:
+                    response = self.controller.update_record(record_id, post_data)
+                    if "Ошибка" in response:
+                        self._send_response(400, f"<h1>Ошибка редактирования</h1><p>{response}</p>")
+                    else:
+                        self._redirect("/")
                 else:
-                    self._redirect("/")
+                    self._send_response(400, "<h1>Ошибка</h1><p>Некорректный ID записи.</p>")
             else:
                 self._send_response(404, "<h1>404</h1><p>Маршрут не найден.</p>")
         except ValueError as e:
             self._send_response(400, f"<h1>Ошибка</h1><p>Некорректный ввод данных: {e}</p>")
         except Exception as e:
             self._send_response(500, f"<h1>Ошибка сервера</h1><p>{e}</p>")
-
 
     def _send_response(self, status, content, content_type="text/html"):
         self.send_response(status)
@@ -75,6 +83,13 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.send_response(302)
         self.send_header("Location", location)
         self.end_headers()
+
+    def _extract_record_id(self):
+        try:
+            record_id = int(unquote(self.path.split("/")[-1]))
+            return record_id
+        except ValueError:
+            return None
 
 
 if __name__ == "__main__":

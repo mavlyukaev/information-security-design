@@ -1,32 +1,25 @@
+from iview import IView 
 import os
-from iview import IView
 
-class View(IView):
+class WebView(IView):
     def display_records(self, records):
-        """Отображение списка записей в консоли"""
-        print("\nСписок записей:")
-        for record in records:
-            print(f"ID: {record['id']}, Имя: {record['name']}, Опыт: {record['experience']} лет")
+        """Рендеринг списка записей в веб-шаблоне"""
+        rows = "\n".join(
+            f"<tr><td>{record['id']}</td><td>{record['name']}</td><td>{record['experience']}</td>"
+            f"<td><a href='/details/{record['id']}'>Детали</a> | "
+            f"<a href='/edit/{record['id']}'>Редактировать</a> | "
+            f"<a href='/delete/{record['id']}'>Удалить</a></td></tr>"
+            for record in records
+        )
+        return self.render_template("index.html", rows=rows)
 
     def display_details(self, record):
-        """Отображение подробностей записи в консоли"""
-        print("\nДетали записи:")
-        for key, value in record.items():
-            print(f"{key.capitalize()}: {value}")
-
-    def get_user_input(self):
-        """Получить ввод пользователя для выбора действия"""
-        print("\nВыберите действие:")
-        print("1. Добавить запись")
-        print("2. Удалить запись")
-        print("3. Редактировать запись")
-        print("4. Просмотреть запись")
-        print("5. Выход")
-        return input("Введите номер действия: ")
+        """Рендеринг деталей записи в веб-шаблоне"""
+        return self.render_template("details.html", **record)
 
     def display_message(self, message):
-        """Вывод сообщения для пользователя"""
-        print(f"\n{message}")
+        """Рендеринг сообщения"""
+        return self.render_template("success.html", message=message)
 
     @staticmethod
     def render_template(template_name, **kwargs):
@@ -34,13 +27,15 @@ class View(IView):
         base_path = os.path.dirname(__file__)
         template_path = os.path.join(base_path, "templates", template_name)
         
-        # Проверяем наличие шаблона
         if not os.path.exists(template_path):
             return f"Ошибка: Шаблон {template_name} не найден."
         
         with open(template_path, "r", encoding="utf-8") as file:
             html = file.read()
-            # Заменяем переменные в шаблоне
             for key, value in kwargs.items():
                 html = html.replace(f"{{{{ {key} }}}}", str(value))
         return html
+
+    def get_user_input(self):
+        """Заглушка метода для веб-приложения."""
+        return None

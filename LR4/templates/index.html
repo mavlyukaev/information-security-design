@@ -2,18 +2,64 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Главная страница</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #fff;
         }
         table, th, td {
-            border: 1px solid black;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f4f4f4;
+            text-align: left;
         }
         th, td {
-            padding: 8px;
+            padding: 12px;
             text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .actions a {
+            margin-right: 10px;
+        }
+        .add-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .add-link:hover {
+            background-color: #218838;
         }
     </style>
 </head>
@@ -33,6 +79,6 @@
             {{{ records }}}
         </tbody>
     </table>
-    <a href="/add">Добавить запись</a>
+    <a href="/add" class="add-link">Добавить запись</a>
 </body>
 </html>
